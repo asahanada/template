@@ -38,9 +38,6 @@ ll exp(ll x,ll y){
     ll t=exp(x,y/2);
     return t*t;
 }
-ll inv(ll x){
-    return expm(x,big-2);
-}
 
 
 int main(){
