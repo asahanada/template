@@ -61,7 +61,7 @@ int main(){
     int n,k;
     cin >> n >> k >> m;
     if(n-1>2*k-1){
-        cout << expm(k,n,m) << endl;
+        cout << expm(k,n,m) << endl;return 0;
     }
     /*
     最初の値がk通り
@@ -75,6 +75,40 @@ int main(){
         1            2^19
     */
     /*
-    dp[i][S]:=i番めまで見て,これまでに出た差分の状態がS.
+    dp[S][j]:=これまでに出た差分の状態がSで,最後に出たのがj+1.
+    ダメになった時点でansに加える,適当になにかのべき乗をかけるパートが存在するので頑張る
     */
+
+    vector<vector<mint>> dp(1<<(2*k-1),vector<mint>(k,mint(0)));
+    rep(i,k){
+        dp[0][i]=1;
+    }
+    /*
+    差分は最小で1-k.
+    これを0に持ってきたいのだから,Sにおいてはk-1を加えた桁の所に持つ.
+    dp[S][i]→dp[S|(1<<(j-i+k-1))][j]みたいな感じになるかな...
+    */
+
+    vector<pair<int,int>> bits;
+    rep(S,1<<(2*k-1)){
+        int cnt=bitset<20>(S).count();
+        bits.push_back({cnt,S});
+    }
+    sort(all(bits));
+    mint ans=0;
+    for(auto now:bits){
+        int S=now.second;
+        int cnt=now.first+1;
+        if(cnt>=n)break;
+        rep(j,k)rep(i,k){//dp[S][j]からdp[S|(i-j+k-1番めのbit)][i]への遷移
+            if((S>>(i-j+k-1))&1){
+                cout << (bitset<3>(S)) << ' ' << j << ' ' << i << endl;
+                cout << expm(k,n-cnt-1,m) << endl;
+                cout << k  << ' ' << n-cnt-1 << endl;
+                ans=ans+mint(expm(k,n-cnt-1,m));continue;
+            }
+            dp[S+(1<<(i-j+k-1))][i]=dp[S+(1<<(i-j+k-1))][i]+dp[S][j];
+        }
+    }
+    cout << ans.x << endl;
 }
